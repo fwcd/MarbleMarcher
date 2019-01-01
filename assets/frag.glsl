@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
-#version 400
+#version 120
 #define AMBIENT_OCCLUSION_COLOR_DELTA vec3(0.7)
 #define AMBIENT_OCCLUSION_STRENGTH 0.008
 #define ANTIALIASING_SAMPLES 1
@@ -41,7 +41,7 @@
 #define SUN_SIZE 0.004
 #define VIGNETTE_STRENGTH 0.5
 
-out vec4 fragColor;
+uniform vec4 fragColor;
 
 uniform mat4 iMat;
 uniform vec2 iResolution;
