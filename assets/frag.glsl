@@ -41,8 +41,6 @@
 #define SUN_SIZE 0.004
 #define VIGNETTE_STRENGTH 0.5
 
-uniform vec4 fragColor;
-
 uniform mat4 iMat;
 uniform vec2 iResolution;
 uniform vec3 iDebug;
@@ -342,5 +340,5 @@ void main() {
 	}
 
 	col *= iExposure / (ANTIALIASING_SAMPLES * ANTIALIASING_SAMPLES);
-  fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
 }
