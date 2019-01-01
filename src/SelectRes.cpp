@@ -18,6 +18,7 @@
 #include "Res.h"
 
 const Resolution all_resolutions[num_resolutions] = {
+  Resolution(320, 180, "Running on a potato, but let's try this..."),
   Resolution(640, 360, "I don't have a dedicated GPU"),
   Resolution(960, 540, "I have a low-end GPU"),
   Resolution(1280, 720, "I have a mid-range GPU"),

@@ -24,7 +24,7 @@ struct Resolution {
   int height;
   char* info;
 };
-static const int num_resolutions = 5;
+static const int num_resolutions = 6;
 const extern Resolution all_resolutions[num_resolutions];
 
 class SelectRes {
