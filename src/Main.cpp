@@ -17,7 +17,7 @@
 #include "Scene.h"
 #include "Level.h"
 #include "Overlays.h"
-#include "Res.h"
+#include "LoadedResources.h"
 #include "SelectRes.h"
 #include "Scores.h"
 #include <SFML/Audio.hpp>
@@ -29,6 +29,12 @@
 #include <thread>
 #include <mutex>
 #include <boost/filesystem.hpp>
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+namespace fs = boost::filesystem;
 
 //Constants
 static const float mouse_sensitivity = 0.005f;
@@ -72,26 +78,26 @@ int main(int argc, char *argv[]) {
   }
   //Load the vertex shader
   sf::Shader shader;
-  if (!shader.loadFromMemory(LOAD_RESOURCE(vert_glsl).Str(), sf::Shader::Vertex)) {
+  if (!shader.loadFromMemory(vert_glsl_resource.Str(), sf::Shader::Vertex)) {
     std::cout << "Failed to compile vertex shader" << std::endl;
     return 1;
   }
   //Load the fragment shader
-  if (!shader.loadFromMemory(LOAD_RESOURCE(frag_glsl).Str(), sf::Shader::Fragment)) {
+  if (!shader.loadFromMemory(frag_glsl_resource.Str(), sf::Shader::Fragment)) {
     std::cout << "Failed to compile fragment shader" << std::endl;
     return 1;
   }
 
   //Load the font
   sf::Font font;
-  const Res font_res = LOAD_RESOURCE(Orbitron_Bold_ttf);
+  const Res font_res = Orbitron_Bold_ttf_resource;
   if (!font.loadFromMemory(font_res.ptr, font_res.size)) {
     std::cout << "Unable to load font" << std::endl;
     return 1;
   }
   //Load the mono font
   sf::Font font_mono;
-  const Res font_mono_res = LOAD_RESOURCE(Inconsolata_Bold_ttf);
+  const Res font_mono_res = Inconsolata_Bold_ttf_resource;
   if (!font_mono.loadFromMemory(font_mono_res.ptr, font_mono_res.size)) {
     std::cout << "Unable to load mono font" << std::endl;
     return 1;
@@ -99,33 +105,38 @@ int main(int argc, char *argv[]) {
 
   //Load the music
   sf::Music menu_music;
-  const Res menu_music_res = LOAD_RESOURCE(menu_ogg);
+  const Res menu_music_res = menu_ogg_resource;
   menu_music.openFromMemory(menu_music_res.ptr, menu_music_res.size);
   menu_music.setLoop(true);
   menu_music.setVolume(music_vol);
   sf::Music level1_music;
-  const Res level1_music_res = LOAD_RESOURCE(level1_ogg);
+  const Res level1_music_res = level1_ogg_resource;
   level1_music.openFromMemory(level1_music_res.ptr, level1_music_res.size);
   level1_music.setLoop(true);
   sf::Music level2_music;
-  const Res level2_music_res = LOAD_RESOURCE(level2_ogg);
+  const Res level2_music_res = level2_ogg_resource;
   level2_music.openFromMemory(level2_music_res.ptr, level2_music_res.size);
   level2_music.setLoop(true);
   sf::Music credits_music;
-  const Res credits_music_res = LOAD_RESOURCE(credits_ogg);
+  const Res credits_music_res = credits_ogg_resource;
   credits_music.openFromMemory(credits_music_res.ptr, credits_music_res.size);
   credits_music.setLoop(true);
 
   //Get the directory for saving and loading high scores
-  const std::string save_dir = std::string(std::getenv("HOME")) + "/.MarbleMarcher";
-  if (!boost::filesystem::exists(save_dir)) {
-    bool success = boost::filesystem::create_directory(save_dir);
+#ifdef _WIN32
+  const fs::path save_dir = fs::path(std::getenv("APPDATA")) / "MarbleMarcher";
+#else
+  const fs::path save_dir = fs::path(std::getenv("HOME")) / ".MarbleMarcher";
+#endif
+  
+  if (!fs::exists(save_dir)) {
+    bool success = fs::create_directory(save_dir);
     if (!success) {
       std::cout << "Failed to create save directory" << std::endl;
       return 1;
     }
   }
-  const std::string save_file = save_dir + "\\scores.bin";
+  const std::string save_file = (save_dir / "scores.bin").string();
 
   //Load scores if available
   high_scores.Load(save_file);
