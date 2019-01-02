@@ -11,7 +11,9 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 ## TARGETS
 
 add_subdirectory(src)
-target_include_directories(MarbleMarcherSources PUBLIC ${EIGEN3_INCLUDE_DIR})
+target_include_directories(MarbleMarcherSources PUBLIC
+  ${EIGEN3_INCLUDE_DIR}
+)
 
 add_executable(MarbleMarcher src/Main.cpp)
 target_link_libraries(MarbleMarcher
@@ -43,9 +45,8 @@ function(create_resources dir output)
   endforeach()
 endfunction()
 
-function(hash_assets)
+function(hash_assets changed_assets)
   file(GLOB assets ${PROJECT_SOURCE_DIR}/assets/*) # Collect assets
-  set(changed_assets false)
   foreach(asset_file ${assets})
     string(REGEX MATCH "([^/]+)$" filename ${asset_file})
     set(hash_file "${PROJECT_SOURCE_DIR}/build/asset_hashes/${filename}.txt")
@@ -53,10 +54,11 @@ function(hash_assets)
     if(EXISTS ${hash_file})
       file(READ ${hash_file} hash_from_file)
       if(NOT ${hash_from_file} STREQUAL ${hash_value})
-        set(changed_assets true)
+        message("Changed ${filename}, rebuilding assets...")
+        set(changed_assets true PARENT_SCOPE)
       endif()
     else()
-      set(changed_assets true)
+      set(changed_assets true PARENT_SCOPE)
     endif()
     file(WRITE ${hash_file} ${hash_value})
   endforeach(asset_file assets)
@@ -64,9 +66,10 @@ endfunction(hash_assets)
 
 # Only update the binary resources if they haven been changed
 # by checking whether the MD5 hash differs from the cached hash
-hash_assets()
+set(changed_assets false)
+hash_assets(changed_assets)
 if(${changed_assets})
-  message("Skipping resource assembly since assets folder has not been changed since last build.")
-else()
   create_resources(assets src/resources.c)
+else()
+  message("Skipping resource assembly since assets folder has not been changed since last build.")
 endif()
