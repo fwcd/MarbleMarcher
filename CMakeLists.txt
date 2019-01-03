@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 ## DEPENDENCIES
 
 find_package(Eigen3 3.3 REQUIRED)
-find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+find_package(SFML 2.5 COMPONENTS system window graphics audio REQUIRED)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 ## TARGETS
@@ -19,6 +19,8 @@ add_executable(MarbleMarcher src/Main.cpp)
 target_link_libraries(MarbleMarcher
   MarbleMarcherSources
   Eigen3::Eigen
+  sfml-system
+  sfml-window
   sfml-graphics
   sfml-audio
   ${Boost_SYSTEM_LIBRARY}
@@ -41,7 +43,7 @@ function(create_resources dir output)
     # Convert hex data for C compatibility
     string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," filedata ${filedata})
     # Append data to output file
-    file(APPEND ${output} "extern const unsigned char ${filename}_bytes[] = {${filedata}};\nextern const unsigned ${filename}_size = sizeof(${filename}_bytes);\n")
+    file(APPEND ${output} "extern \"C\" const unsigned char ${filename}_bytes[] = {${filedata}};\nextern \"C\" const unsigned ${filename}_size = sizeof(${filename}_bytes);\n")
   endforeach()
 endfunction()
 
