@@ -15,9 +15,10 @@
 * along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 #version 120
-#extension GL_EXT_gpu_shader4 : require
 
-const vec2 quadVertices[4] = vec2[4]( vec2(-1.0, -1.0), vec2(1.0, -1.0), vec2(-1.0, 1.0), vec2(1.0, 1.0) );
+uniform vec2 iResolution;
+
 void main() {
-	gl_Position = vec4(quadVertices[gl_VertexID], 0.0, 1.0);
+	vec2 pos = (gl_Vertex.xy / iResolution) * 2.0 - vec2(1, 1); 
+	gl_Position = vec4(pos, 0.0, 1.0);
 }
